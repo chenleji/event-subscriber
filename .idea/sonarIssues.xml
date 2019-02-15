@@ -68,6 +68,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/service/hostapi/events/send_to_appc_handler.go">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/service/hostapi/util/util.go">
           <value>
             <set />
