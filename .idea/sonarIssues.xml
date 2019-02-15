@@ -8,6 +8,16 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/apply.sh">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/core/compute/compute_common.go">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/core/ping/ping.go">
           <value>
             <set />
@@ -54,6 +64,26 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/handlers/storage.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/main.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/register/register.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/register/service_windows.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/scripts/test">
           <value>
             <set />
           </value>
@@ -124,6 +154,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/client/clientImpl.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/client/containerEvent.go">
           <value>
             <set />
           </value>
