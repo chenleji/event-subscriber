@@ -3,8 +3,8 @@ package events
 import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
+	"github.com/chenleji/event-subscriber/client"
 	"github.com/chenleji/event-subscriber/locks"
-	"github.com/rancher/go-rancher/v3"
 )
 
 type EventLocker func(event *Event) locks.Locker
@@ -20,7 +20,8 @@ func resourceIDLocker(event *Event) locks.Locker {
 }
 
 type WorkerPool interface {
-	HandleWork(event *Event, eventHandlers map[string]EventHandler, apiClient *client.RancherClient)
+	HandleWork(event *Event, eventHandlers map[string]EventHandler, apiClient *client.GenericClient)
+
 }
 
 type skippingWorkerPool struct {
@@ -39,7 +40,7 @@ func SkippingWorkerPool(size int, eventLocker EventLocker) WorkerPool {
 	return wp
 }
 
-func (wp *skippingWorkerPool) HandleWork(event *Event, eventHandlers map[string]EventHandler, apiClient *client.RancherClient) {
+func (wp *skippingWorkerPool) HandleWork(event *Event, eventHandlers map[string]EventHandler, apiClient *client.GenericClient) {
 	select {
 	case w := <-wp.workers:
 		go func() {
@@ -65,7 +66,7 @@ func NonSkippingWorkerPool(size int) WorkerPool {
 	return wp
 }
 
-func (wp *nonSkippingWorkerPool) HandleWork(event *Event, eventHandlers map[string]EventHandler, apiClient *client.RancherClient) {
+func (wp *nonSkippingWorkerPool) HandleWork(event *Event, eventHandlers map[string]EventHandler, apiClient *client.GenericClient) {
 	w := <-wp.workers
 	go func() {
 		defer func() { wp.workers <- w }()
@@ -73,7 +74,7 @@ func (wp *nonSkippingWorkerPool) HandleWork(event *Event, eventHandlers map[stri
 	}()
 }
 
-func doWork(event *Event, eventHandlers map[string]EventHandler, apiClient *client.RancherClient, locker locks.Locker) {
+func doWork(event *Event, eventHandlers map[string]EventHandler, apiClient *client.GenericClient, locker locks.Locker) {
 	if event.Name != "ping" {
 		log.WithFields(log.Fields{
 			"event": *event,

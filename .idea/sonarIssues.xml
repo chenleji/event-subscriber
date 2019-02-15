@@ -18,12 +18,42 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/client/apiError.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/client/client.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/client/clientImpl.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/client/schemas.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/client/types.go">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/events/event.go">
           <value>
             <set />
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/events/event_router_test.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/events/handlers.go">
           <value>
             <set />
           </value>

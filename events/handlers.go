@@ -1,7 +1,7 @@
 package events
 
-import "github.com/rancher/go-rancher/v3"
+import "github.com/chenleji/event-subscriber/client"
 
-func DropEvent(event *Event, apiClient *client.RancherClient) error {
+func DropEvent(event *Event, apiClient *client.GenericClient) error {
 	return nil
 }

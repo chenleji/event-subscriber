@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"github.com/chenleji/event-subscriber/client"
 
 	"io/ioutil"
 	"net/http"
@@ -16,16 +17,15 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
-	"github.com/rancher/go-rancher/v3"
 )
 
 var slashRegex = regexp.MustCompile("[/]{2,}")
 
 // EventHandler Defines the function "interface" that handlers must conform to.
-type EventHandler func(*Event, *client.RancherClient) error
+type EventHandler func(*Event, *client.GenericClient) error
 
 type EventRouter struct {
-	apiClient     *client.RancherClient
+	apiClient     *client.GenericClient
 	subscribeURL  string
 	eventHandlers map[string]EventHandler
 	workerCount   int
@@ -33,10 +33,10 @@ type EventRouter struct {
 	PingConfig    PingConfig
 }
 
-func NewEventRouter(apiClient *client.RancherClient, workerCount int, eventHandlers map[string]EventHandler) (*EventRouter, error) {
+func NewEventRouter(apiClient *client.GenericClient, workerCount int, eventHandlers map[string]EventHandler) (*EventRouter, error) {
 	subscribeURL := ""
 
-	if apiClient.RancherBaseClient != nil {
+	if apiClient.GenericBaseClient != nil {
 		schema, ok := apiClient.GetTypes()["subscribe"]
 		if !ok {
 			return nil, errors.New("Client is not able to subscribe to events")
@@ -96,8 +96,8 @@ func (router *EventRouter) run(wp WorkerPool, ready chan<- bool, eventSuffix str
 
 	accessKey := ""
 	secretKey := ""
-	if router.apiClient.RancherBaseClient != nil {
-		accessKey = router.apiClient.GetOpts().AccessKey
+	if router.apiClient.GenericBaseClient != nil {
+		accessKey = router.apiClient.GetOpts().SecretID
 		secretKey = router.apiClient.GetOpts().SecretKey
 	}
 

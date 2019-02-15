@@ -3,6 +3,7 @@ package events
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/chenleji/event-subscriber/client"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -12,7 +13,6 @@ import (
 	"time"
 
 	tu "github.com/chenleji/event-subscriber/testutils"
-	"github.com/rancher/go-rancher/v3"
 )
 
 const eventServerPort string = "8005"
@@ -20,7 +20,7 @@ const baseURL string = "http://localhost:" + eventServerPort
 const pushURL string = baseURL + "/pushEvent"
 
 func newRouter(eventHandlers map[string]EventHandler, workerCount int, t *testing.T, pingConfig PingConfig) *EventRouter {
-	fakeAPIClient := &client.RancherClient{}
+	fakeAPIClient := &client.GenericClient{}
 	router, err := NewEventRouter(fakeAPIClient, workerCount, eventHandlers)
 	if err != nil {
 		t.Fatal(err)
@@ -31,7 +31,7 @@ func newRouter(eventHandlers map[string]EventHandler, workerCount int, t *testin
 }
 
 func TestWebsocketPingTimeout(t *testing.T) {
-	testHandler := func(event *Event, apiClient *client.RancherClient) error {
+	testHandler := func(event *Event, apiClient *client.GenericClient) error {
 		return nil
 	}
 
@@ -71,7 +71,7 @@ func TestWebsocketPingTimeout(t *testing.T) {
 // three events.
 func TestSimpleRouting(t *testing.T) {
 	eventsReceived := make(chan *Event)
-	testHandler := func(event *Event, apiClient *client.RancherClient) error {
+	testHandler := func(event *Event, apiClient *client.GenericClient) error {
 		eventsReceived <- event
 		return nil
 	}
@@ -120,7 +120,7 @@ func TestSimpleRouting(t *testing.T) {
 func TestEventDropping(t *testing.T) {
 	eventsReceived := make(chan *Event)
 	stopWaiting := make(chan bool)
-	testHandler := func(event *Event, apiClient *client.RancherClient) error {
+	testHandler := func(event *Event, apiClient *client.GenericClient) error {
 		eventsReceived <- event
 		<-stopWaiting
 		return nil
@@ -169,7 +169,7 @@ func TestEventDropping(t *testing.T) {
 // when they are done doing their work and capable of handling more work.
 func TestWorkerReuse(t *testing.T) {
 	eventsReceived := make(chan *Event)
-	testHandler := func(event *Event, apiClient *client.RancherClient) error {
+	testHandler := func(event *Event, apiClient *client.GenericClient) error {
 		time.Sleep(10 * time.Millisecond)
 		eventsReceived <- event
 		return nil
