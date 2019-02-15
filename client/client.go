@@ -14,12 +14,6 @@ const (
 	PUBLISH_TYPE = "publish"
 )
 
-type GenericBaseClientImpl struct {
-	Opts    *ClientOpts
-	Schemas *Schemas
-	Types   map[string]Schema
-}
-
 type GenericBaseClient interface {
 	Websocket(string, map[string][]string) (*websocket.Conn, *http.Response, error)
 	List(string, *ListOpts, interface{}) error

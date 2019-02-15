@@ -58,3 +58,12 @@ func newApiError(resp *http.Response, url string) *ApiError {
 		Body:       body,
 	}
 }
+
+func IsNotFound(err error) bool {
+	apiError, ok := err.(*ApiError)
+	if !ok {
+		return false
+	}
+
+	return apiError.StatusCode == http.StatusNotFound
+}

@@ -3,6 +3,91 @@
   <component name="issues">
     <option name="index">
       <map>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/appc/appcClient.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/core/ping/ping.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/core/ping/ping_common.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/core/progress/progress.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/events/listener.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/handlers/common.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/handlers/compute.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/handlers/config_update.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/handlers/ping.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/handlers/response.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/handlers/storage.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/service/hostapi/events/entry.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/service/hostapi/events/entry_test.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/service/hostapi/util/util.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/utilities/docker/compute_lock.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/utilities/utils/response.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../git.dev.yonghui.cn/oceanus/hermit-crab/utilities/utils/utils.go">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/.gitignore">
           <value>
             <set />
@@ -19,6 +104,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/client/apiError.go">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/client/appcClient.go">
           <value>
             <set />
           </value>

@@ -3,13 +3,14 @@ package client
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/pkg/errors"
 	"fmt"
 	"github.com/gorilla/websocket"
-	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
 	"time"
 )
@@ -25,25 +26,52 @@ var (
 	privateFieldRegex = regexp.MustCompile("^[[:lower:]]")
 )
 
-type clientImpl struct {
+type GenericBaseClientImpl struct {
 	Opts    *ClientOpts
 	Schemas *Schemas
 	Types   map[string]Schema
-}
+} 
 
-func (apiClient *clientImpl) setupRequest(req *http.Request) {
+func (apiClient *GenericBaseClientImpl) setupRequest(req *http.Request) {
 	req.SetBasicAuth(apiClient.Opts.SecretID, apiClient.Opts.SecretKey)
 }
 
-func (apiClient *clientImpl) newHttpClient() *http.Client {
+func (apiClient *GenericBaseClientImpl) newHttpClient() *http.Client {
 	if apiClient.Opts.Timeout == 0 {
 		apiClient.Opts.Timeout = time.Second * 10
 	}
 	return &http.Client{Timeout: apiClient.Opts.Timeout}
 }
 
+func (apiClient *GenericBaseClientImpl) doDelete(url string) error {
+	client := apiClient.newHttpClient()
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		return err
+	}
 
-func (apiClient *clientImpl) doGet(url string, opts *ListOpts, respObject interface{}) error {
+	apiClient.setupRequest(req)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	io.Copy(ioutil.Discard, resp.Body)
+
+	if resp.StatusCode >= 300 {
+		return newApiError(resp, url)
+	}
+
+	return nil
+}
+
+func (apiClient *GenericBaseClientImpl) Websocket(url string, headers map[string][]string) (*websocket.Conn, *http.Response, error) {
+	return dialer.Dial(url, http.Header(headers))
+}
+
+func (apiClient *GenericBaseClientImpl) doGet(url string, opts *ListOpts, respObject interface{}) error {
 	if opts == nil {
 		opts = NewListOpts()
 	}
@@ -91,7 +119,11 @@ func (apiClient *clientImpl) doGet(url string, opts *ListOpts, respObject interf
 	return nil
 }
 
-func (apiClient *clientImpl) doList(schemaType string, opts *ListOpts, respObject interface{}) error {
+func (apiClient *GenericBaseClientImpl) List(schemaType string, opts *ListOpts, respObject interface{}) error {
+	return apiClient.doList(schemaType, opts, respObject)
+}
+
+func (apiClient *GenericBaseClientImpl) doList(schemaType string, opts *ListOpts, respObject interface{}) error {
 	schema, ok := apiClient.Types[schemaType]
 	if !ok {
 		return errors.New("Unknown schema type [" + schemaType + "]")
@@ -109,11 +141,24 @@ func (apiClient *clientImpl) doList(schemaType string, opts *ListOpts, respObjec
 	return apiClient.doGet(collectionUrl, opts, respObject)
 }
 
-func (apiClient *clientImpl) doNext(nextUrl string, respObject interface{}) error {
+func (apiClient *GenericBaseClientImpl) doNext(nextUrl string, respObject interface{}) error {
 	return apiClient.doGet(nextUrl, nil, respObject)
 }
 
-func (apiClient *clientImpl) doModify(method string, url string, createObj interface{}, respObject interface{}) error {
+func (apiClient *GenericBaseClientImpl) Post(url string, createObj interface{}, respObject interface{}) error {
+	return apiClient.doModify("POST", url, createObj, respObject)
+}
+
+func (apiClient *GenericBaseClientImpl) GetLink(resource Resource, link string, respObject interface{}) error {
+	url := resource.Links[link]
+	if url == "" {
+		return fmt.Errorf("Failed to find link: %s", link)
+	}
+
+	return apiClient.doGet(url, &ListOpts{}, respObject)
+}
+
+func (apiClient *GenericBaseClientImpl) doModify(method string, url string, createObj interface{}, respObject interface{}) error {
 	bodyContent, err := json.Marshal(createObj)
 	if err != nil {
 		return err
@@ -159,7 +204,11 @@ func (apiClient *clientImpl) doModify(method string, url string, createObj inter
 	return nil
 }
 
-func (apiClient *clientImpl) doCreate(schemaType string, createObj interface{}, respObject interface{}) error {
+func (apiClient *GenericBaseClientImpl) Create(schemaType string, createObj interface{}, respObject interface{}) error {
+	return apiClient.doCreate(schemaType, createObj, respObject)
+}
+
+func (apiClient *GenericBaseClientImpl) doCreate(schemaType string, createObj interface{}, respObject interface{}) error {
 	if createObj == nil {
 		createObj = map[string]string{}
 	}
@@ -187,7 +236,11 @@ func (apiClient *clientImpl) doCreate(schemaType string, createObj interface{}, 
 	return apiClient.doModify("POST", collectionUrl, createObj, respObject)
 }
 
-func (apiClient *clientImpl) doUpdate(schemaType string, existing *Resource, updates interface{}, respObject interface{}) error {
+func (apiClient *GenericBaseClientImpl) Update(schemaType string, existing *Resource, updates interface{}, respObject interface{}) error {
+	return apiClient.doUpdate(schemaType, existing, updates, respObject)
+}
+
+func (apiClient *GenericBaseClientImpl) doUpdate(schemaType string, existing *Resource, updates interface{}, respObject interface{}) error {
 	if existing == nil {
 		return errors.New("Existing object is nil")
 	}
@@ -217,7 +270,11 @@ func (apiClient *clientImpl) doUpdate(schemaType string, existing *Resource, upd
 	return apiClient.doModify("PUT", selfUrl, updates, respObject)
 }
 
-func (apiClient *clientImpl) doById(schemaType string, id string, respObject interface{}) error {
+func (apiClient *GenericBaseClientImpl) ById(schemaType string, id string, respObject interface{}) error {
+	return apiClient.doById(schemaType, id, respObject)
+}
+
+func (apiClient *GenericBaseClientImpl) doById(schemaType string, id string, respObject interface{}) error {
 	schema, ok := apiClient.Types[schemaType]
 	if !ok {
 		return errors.New("Unknown schema type [" + schemaType + "]")
@@ -237,7 +294,14 @@ func (apiClient *clientImpl) doById(schemaType string, id string, respObject int
 	return err
 }
 
-func (apiClient *clientImpl) doResourceDelete(schemaType string, existing *Resource) error {
+func (apiClient *GenericBaseClientImpl) Delete(existing *Resource) error {
+	if existing == nil {
+		return nil
+	}
+	return apiClient.doResourceDelete(existing.Type, existing)
+}
+
+func (apiClient *GenericBaseClientImpl) doResourceDelete(schemaType string, existing *Resource) error {
 	schema, ok := apiClient.Types[schemaType]
 	if !ok {
 		return errors.New("Unknown schema type [" + schemaType + "]")
@@ -255,7 +319,21 @@ func (apiClient *clientImpl) doResourceDelete(schemaType string, existing *Resou
 	return apiClient.doDelete(selfUrl)
 }
 
-func (apiClient *clientImpl) doAction(schemaType string, action string,
+func (apiClient *GenericBaseClientImpl) Reload(existing *Resource, output interface{}) error {
+	selfUrl, ok := existing.Links[SELF]
+	if !ok {
+		return errors.New(fmt.Sprintf("Failed to find self URL of [%v]", existing))
+	}
+
+	return apiClient.doGet(selfUrl, NewListOpts(), output)
+}
+
+func (apiClient *GenericBaseClientImpl) Action(schemaType string, action string,
+	existing *Resource, inputObject, respObject interface{}) error {
+	return apiClient.doAction(schemaType, action, existing, inputObject, respObject)
+}
+
+func (apiClient *GenericBaseClientImpl) doAction(schemaType string, action string,
 	existing *Resource, inputObject, respObject interface{}) error {
 
 	if existing == nil {
@@ -318,31 +396,24 @@ func (apiClient *clientImpl) doAction(schemaType string, action string,
 	return json.Unmarshal(byteContent, respObject)
 }
 
-
-func (apiClient *clientImpl) doDelete(url string) error {
-	client := apiClient.newHttpClient()
-	req, err := http.NewRequest("DELETE", url, nil)
-	if err != nil {
-		return err
-	}
-
-	apiClient.setupRequest(req)
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	io.Copy(ioutil.Discard, resp.Body)
-
-	if resp.StatusCode >= 300 {
-		return newApiError(resp, url)
-	}
-
-	return nil
+func (apiClient *GenericBaseClientImpl) GetOpts() *ClientOpts {
+	return apiClient.Opts
 }
 
+func (apiClient *GenericBaseClientImpl) GetSchemas() *Schemas {
+	return apiClient.Schemas
+}
+
+func (apiClient *GenericBaseClientImpl) GetTypes() map[string]Schema {
+	return apiClient.Types
+}
+
+func init() {
+	debug = os.Getenv("RANCHER_CLIENT_DEBUG") == "true"
+	if debug {
+		fmt.Println("Rancher client debug on")
+	}
+}
 
 func contains(array []string, item string) bool {
 	for _, check := range array {
